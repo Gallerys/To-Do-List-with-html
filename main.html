@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exciting Single Page Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #app {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        input {
+            width: 70%;
+            padding: 8px;
+            margin-right: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <h1>Exciting To-Do List</h1>
+    <input type="text" id="taskInput" placeholder="Add a new task">
+    <button onclick="addTask()">Add Task</button>
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    // Sample XML data for tasks
+    var xmlData = `
+        <tasks>
+            <task>Task 1</task>
+            <task>Task 2</task>
+            <task>Task 3</task>
+        </tasks>
+    `;
+
+    // Parse XML data
+    var parser = new DOMParser();
+    var xmlDoc = parser.parseFromString(xmlData, "text/xml");
+
+    // Display existing tasks
+    var taskList = document.getElementById("taskList");
+    xmlDoc.querySelectorAll("task").forEach(function(taskNode) {
+        addTaskToUI(taskNode.textContent);
+    });
+
+    // Function to add a new task
+    function addTask() {
+        var taskInput = document.getElementById("taskInput");
+        var newTask = taskInput.value.trim();
+
+        if (newTask !== "") {
+            // Add the new task to the XML data
+            var newTaskNode = xmlDoc.createElement("task");
+            newTaskNode.textContent = newTask;
+            xmlDoc.querySelector("tasks").appendChild(newTaskNode);
+
+            // Add the new task to the UI
+            addTaskToUI(newTask);
+
+            // Clear the input field
+            taskInput.value = "";
+        }
+    }
+
+    // Function to add a task to the UI
+    function addTaskToUI(taskText) {
+        var li = document.createElement("li");
+        li.innerHTML = `
+            <span>${taskText}</span>
+            <button onclick="removeTask(this)">Remove</button>
+        `;
+        taskList.appendChild(li);
+    }
+
+    // Function to remove a task
+    function removeTask(button) {
+        var li = button.parentElement;
+        var taskText = li.querySelector("span").textContent;
+
+        // Remove the task from the XML data
+        xmlDoc.querySelectorAll("task").forEach(function(taskNode) {
+            if (taskNode.textContent === taskText) {
+                taskNode.parentElement.removeChild(taskNode);
+            }
+        });
+
+        // Remove the task from the UI
+        taskList.removeChild(li);
+    }
+</script>
+
+</body>
+</html>
